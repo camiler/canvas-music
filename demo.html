@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>音乐</title>
+	
+</head>
+<body>
+	<canvas id="canvas" width="25" height="25" style="border-bottom: 1px solid #ddd">抱歉，该浏览器不支持canvas。请更换浏览器打开！</canvas>
+</body>
+<script type="text/javascript">
+	window.onload = function(e){
+		var canvas = document.getElementById('canvas'),
+			ctx = canvas.getContext("2d");
+		
+		drawRect(3,13,4,12);
+		drawRect(10,5,4,20);
+		drawRect(17,9,4,16);
+		
+		function drawRect(x,y,dx,dy){
+			
+			ctx.fillStyle = '#ddd';
+			ctx.fillRect(x,y,dx,dy);
+			
+		}
+
+		var y0 = 25;
+		var rectYarr = [13, 20, 7],
+			opArr = ['add', 'sub', 'add'],
+			range = [[13,20],[5,15],[7,17]];
+
+		var timer = setInterval(function(){
+			ctx.clearRect(0,0,canvas.width, canvas.height);
+
+			for (var i = 2; i >= 0; i--) {
+				if( opArr[i] == 'add' ){
+					rectYarr[i]++;
+				}else{
+					rectYarr[i]--;
+				}
+				if ( rectYarr[i] == range[i][1] ) {
+					opArr[i] = 'sub';
+				}
+				if ( rectYarr[i] == range[i][0] ) {
+					opArr[i] = 'add';
+				}
+			}
+
+			drawRect(3,rectYarr[0],4, y0-rectYarr[0]);
+			drawRect(10,rectYarr[1],4,y0-rectYarr[1]);
+			drawRect(17,rectYarr[2],4,y0-rectYarr[2]);
+		},80);
+		
+	}
+
+</script>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>音乐</title>
+	
+</head>
+<body>
+	<audio id="audio" autoplay="autoplay" loop="loop">
+		<source src="01.mp3" type="audio/mpeg" />
+		<source src="10.mp3" type="audio/mpeg" />
+		抱歉，该浏览器不支持audio。请更换浏览器打开！
+	</audio>
+	<canvas id="canvas" width="25" height="25" style="border-bottom: 1px solid #ddd;display:block;cursor:pointer;position:fixed;right:10px">抱歉，该浏览器不支持canvas。请更换浏览器打开！</canvas>
+</body>
+<script type="text/javascript">
+(function(w){
+	function Music(opts){
+		this.opts = _extend({},{
+			canvasId: 'musicCanvas',
+			colorValue: '#ddd',
+			rectYarr: [13, 20, 7],
+			y0: 25,
+			opArr: ['add', 'sub', 'add'],
+			range: [[13,20],[5,15],[7,17]],
+			init: [[3,13,4,12],[10,5,4,20],[17,9,4,16]]
+		}, opts);
+
+		this.draw();
+		
+	}
+	Music.prototype={
+		getAbout: function(){
+			this.canvas = document.getElementById(this.opts.canvasId);
+			this.ctx = canvas.getContext("2d");
+			this.color = this.opts.colorValue;
+
+			var initXY = this.opts.init;
+			this.x = [];
+			this.dx = [];
+
+			for (var i = initXY.length - 1; i >= 0; i--) {
+				this.x[i] = initXY[i][0];
+				this.dx[i] = initXY[i][2];
+
+				var y = initXY[i][1],
+					dy = initXY[i][3];
+
+				this.drawRect(this.x[i],y,this.dx[i],dy);
+			};
+		},
+		drawRect: function(x, y, dx, dy){
+			this.ctx.fillStyle = this.color;
+			this.ctx.fillRect(x,y,dx,dy);
+		},
+		draw: function(){
+
+			this.getAbout();
+			this.setIntervalDraw();
+		},
+		setIntervalDraw: function(){
+			var y0 = this.opts.y0;
+			var rectYarr = this.opts.rectYarr,
+				opArr = this.opts.opArr,
+				range = this.opts.range;
+			var me = this;
+			this.timer = setInterval(function(){
+				me.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+
+				for (var i = 2; i >= 0; i--) {
+					if( opArr[i] == 'add' ){
+						rectYarr[i]++;
+					}else{
+						rectYarr[i]--;
+					}
+					if ( rectYarr[i] == range[i][1] ) {
+						opArr[i] = 'sub';
+					}
+					if ( rectYarr[i] == range[i][0] ) {
+						opArr[i] = 'add';
+					}
+					me.drawRect(me.x[i],rectYarr[i], me.dx[i], y0-rectYarr[i]);
+				}
+
+			},80);
+		}
+	}
+
+	function _extend(obj, defaults, opts){
+		var name, copy;
+		if ( !opts ) {
+			return defaults;
+		}
+		if( defaults != null ){
+			for( name in defaults ){
+				copy = defaults[ name ];
+				if( opts[ name ] ){
+					obj[ name ] = opts[ name ];
+				}else{
+					obj[ name ] = copy;
+				}
+			}
+			return obj
+		}
+		
+	}
+
+	w.Music = Music;
+
+})(window)
+window.onload = function(){
+	var music = new Music({
+		canvasId: 'canvas',
+		colorValue: '#e3f14a'
+	});
+	music.canvas.onclick = function(e){
+		var audio = document.getElementById('audio');
+		if ( music.timer ) {
+			audio.pause();
+			clearInterval(music.timer); 
+			music.timer = null;
+		}else{
+			audio.play();
+			music.setIntervalDraw();
+		}
+	}
+}
+</script>
+</html>
